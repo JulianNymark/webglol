@@ -24,47 +24,7 @@ function main() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   // shaders
-
-  // barrier for catching async loading of shaders :)
-  var barrier = {
-    limit: 2,
-    current: 0,
-    hit: function() {
-      this.current += 1;
-      if (this.current >= this.limit) {
-        this.breach();
-      }
-    },
-    breach: function() {
-      console.log('barrier breached :), we have the shaders now');
-      afterLoadingShaders();
-    },
-    init: function() {
-      return this;
-    }
-  }.init();
-
-  // fetch fragment shader
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", "shaders/shader.frag");
-  xhr.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      fragmentShaderSource = this.responseText;
-      barrier.hit();
-    }
-  };
-  xhr.send();
-
-  // fetch vertex shader
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", "shaders/shader.vert");
-  xhr.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      vertexShaderSource = this.responseText;
-      barrier.hit();
-    }
-  };
-  xhr.send();
+  getShaders().then(afterLoadingShaders);
 }
 
 function afterLoadingShaders() {
@@ -131,4 +91,27 @@ function setMatrixUniforms() {
 
   var mvUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
   gl.uniformMatrix4fv(mvUniform, false, new Float32Array(mvMatrix.flatten()));
+}
+
+function makePerspective(FOV, AspectRatio, Closest, Farest){
+  var YLimit = Closest * Math.tan(FOV * Math.PI / 360);
+  var A = -( Farest + Closest ) / ( Farest - Closest );
+  var B = -2 * Farest * Closest / ( Farest - Closest );
+  var C = (2 * Closest) / ( (YLimit * AspectRatio) * 2 );
+  var D = (2 * Closest) / ( YLimit * 2 );
+  return [
+    C, 0, 0, 0,
+    0, D, 0, 0,
+    0, 0, A, -1,
+    0, 0, B, 0
+  ];
+}
+
+function makeTransform(Object){
+  return [
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, -6, 1
+  ];
 }
