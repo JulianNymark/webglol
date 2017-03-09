@@ -46,7 +46,8 @@ function afterLoadingShaders() {
   ];
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-  // CONTINUE HERE
+  randomValueLoc = gl.getUniformLocation(shaderProgram, "random");
+
   drawScene();
 }
 
@@ -55,6 +56,16 @@ function drawScene() {
   gl.clearColor(0, 0, 0, 0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.useProgram(shaderProgram);
+
+  // send random values to the fragment shader
+  gl.uniform3f(randomValueLoc, Math.random(), Math.random(), Math.random());
+
+  drawSquare();
+
+  requestAnimationFrame(drawScene);
+}
+
+function drawSquare(){
   gl.enableVertexAttribArray(positionAttributeLocation);
 
   // Bind the position buffer.

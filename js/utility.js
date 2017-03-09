@@ -12,7 +12,7 @@ function getShaders() {
         }
       },
       breach: function() {
-        resolve()
+        resolve();
       },
       init: function() {
         return this;
