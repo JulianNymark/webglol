@@ -6,7 +6,7 @@ var gl;
 var fragmentShaderSource;
 var vertexShaderSource;
 
-var shaders;
+var shaderSource;
 var shaderPrograms = {};
 
 const resolution = {
@@ -29,21 +29,17 @@ function main() {
   gl.depthFunc(gl.LEQUAL);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  // shaders
-  getShaders(['1.frag', '1.vert'])
+  // shaderSource fetching (ideally JS should find filenames itself?)
+  getShaders(['1.frag', '1.vert', 'mandelbrot.frag', 'brush.frag'])
     .then(function(resolved, rejected) {
-      shaders = resolved;
+      shaderSource = resolved;
       afterLoadingShaders();
     });
 }
 
 function afterLoadingShaders() {
-  var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, shaders['1.frag']);
-  var vertexShader = createShader(gl, gl.VERTEX_SHADER, shaders['1.vert']);
+  shaderPrograms['1_brush'] = shaderProgram('1.vert', 'brush.frag');
 
-  shaderPrograms['f1v1'] = createProgram(gl, vertexShader, fragmentShader);
-
-  positionAttributeLocation = gl.getAttribLocation(shaderPrograms['f1v1'], "a_position");
   squareVerticesBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesBuffer);
 
@@ -58,9 +54,10 @@ function afterLoadingShaders() {
   ];
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-  s_randomValueLoc = gl.getUniformLocation(shaderPrograms['f1v1'], "random");
-  s_mouse = gl.getUniformLocation(shaderPrograms['f1v1'], "mouse");
-  s_resolution = gl.getUniformLocation(shaderPrograms['f1v1'], "resolution");
+  positionAttributeLocation = gl.getAttribLocation(shaderPrograms['1_brush'], "a_position");
+  s_randomValueLoc = gl.getUniformLocation(shaderPrograms['1_brush'], "random");
+  s_mouse = gl.getUniformLocation(shaderPrograms['1_brush'], "mouse");
+  s_resolution = gl.getUniformLocation(shaderPrograms['1_brush'], "resolution");
 
   drawScene();
 }
@@ -69,7 +66,7 @@ function drawScene() {
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   gl.clearColor(0, 0, 0, 0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  gl.useProgram(shaderPrograms['f1v1']);
+  gl.useProgram(shaderPrograms['1_brush']);
 
   // send to the fragment shader
   gl.uniform3f(s_randomValueLoc, Math.random(), Math.random(), Math.random());

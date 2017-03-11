@@ -67,3 +67,10 @@ function createProgram(gl, vertexShader, fragmentShader) {
   console.log(gl.getProgramInfoLog(program));
   gl.deleteProgram(program);
 }
+
+function shaderProgram(vertShaderName, fragShaderName) {
+  var vertexShader = createShader(gl, gl.VERTEX_SHADER, shaderSource[vertShaderName]);
+  var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, shaderSource[fragShaderName]);
+
+  return createProgram(gl, vertexShader, fragmentShader);
+}
