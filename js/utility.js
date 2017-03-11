@@ -1,46 +1,42 @@
-function getShaders() {
-  return new Promise(function(resolve, reject){
+function getShaders(shaderNames) {
+  var shaders = {};
 
+  return new Promise(function(resolve, reject){
     // barrier for catching async loading of shaders :)
     var barrier = {
-      limit: 2,
+      limit: shaderNames.length,
       current: 0,
       hit: function() {
         this.current += 1;
-        if (this.current >= this.limit) {
-          this.breach();
-        }
+        if (this.current >= this.limit) { this.breach(); }
       },
       breach: function() {
-        resolve();
+        resolve(shaders);
       },
       init: function() {
         return this;
       }
     }.init();
 
-    // fetch fragment shader
+    for (i = 0; i < shaderNames.length; i++ ) {
+      sendShaderGet(shaderNames[i]).then( function(resolved, rejected) {
+        shaders[resolved[0]] = resolved[1];
+        barrier.hit();
+      });
+    }
+  });
+}
+
+function sendShaderGet(shaderName){
+  return new Promise(function(resolve, reject){
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "shaders/shader.frag");
+    xhr.open("GET", "shaders/" + shaderName);
     xhr.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
-        fragmentShaderSource = this.responseText;
-        barrier.hit();
+        resolve([shaderName, this.responseText]);
       }
     };
     xhr.send();
-
-    // fetch vertex shader
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", "shaders/shader.vert");
-    xhr.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        vertexShaderSource = this.responseText;
-        barrier.hit();
-      }
-    };
-    xhr.send();
-
   });
 }
 

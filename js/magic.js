@@ -22,12 +22,15 @@ function main() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   // shaders
-  getShaders().then(afterLoadingShaders);
+  getShaders(['1.frag', '1.vert']).then(function(value){
+    console.log(value);
+    afterLoadingShaders(value);
+  });
 }
 
-function afterLoadingShaders() {
-  var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
-  var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+function afterLoadingShaders(shaders) {
+  var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, shaders['1.frag']);
+  var vertexShader = createShader(gl, gl.VERTEX_SHADER, shaders['1.vert']);
 
   shaderProgram = createProgram(gl, vertexShader, fragmentShader);
 
