@@ -19,10 +19,11 @@ function getShaders(shaderNames) {
     }.init();
 
     for (i = 0; i < shaderNames.length; i++ ) {
-      sendShaderGet(shaderNames[i]).then( function(resolved, rejected) {
-        shaders[resolved[0]] = resolved[1];
-        barrier.hit();
-      });
+      sendShaderGet(shaderNames[i])
+        .then(function(resolved, rejected) {
+          shaders[resolved[0]] = resolved[1];
+          barrier.hit();
+        });
     }
   });
 }

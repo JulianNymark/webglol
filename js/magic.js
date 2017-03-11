@@ -6,12 +6,20 @@ var gl;
 var fragmentShaderSource;
 var vertexShaderSource;
 
+var shaders;
+var shaderPrograms = {};
+
+const resolution = {
+  x:1000,
+  y:1000
+};
+
 function main() {
   // canvas
   var canvas = document.createElement('canvas');
   canvas.id = 'thecanvas';
-  canvas.width  = 400;
-  canvas.height = 400;
+  canvas.width  = resolution.x;
+  canvas.height = resolution.y;
   document.body.appendChild(canvas);
 
   // webglmagic
@@ -22,19 +30,20 @@ function main() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   // shaders
-  getShaders(['1.frag', '1.vert']).then(function(value){
-    console.log(value);
-    afterLoadingShaders(value);
-  });
+  getShaders(['1.frag', '1.vert'])
+    .then(function(resolved, rejected) {
+      shaders = resolved;
+      afterLoadingShaders();
+    });
 }
 
-function afterLoadingShaders(shaders) {
+function afterLoadingShaders() {
   var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, shaders['1.frag']);
   var vertexShader = createShader(gl, gl.VERTEX_SHADER, shaders['1.vert']);
 
-  shaderProgram = createProgram(gl, vertexShader, fragmentShader);
+  shaderPrograms['f1v1'] = createProgram(gl, vertexShader, fragmentShader);
 
-  positionAttributeLocation = gl.getAttribLocation(shaderProgram, "a_position");
+  positionAttributeLocation = gl.getAttribLocation(shaderPrograms['f1v1'], "a_position");
   squareVerticesBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesBuffer);
 
@@ -49,7 +58,9 @@ function afterLoadingShaders(shaders) {
   ];
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-  randomValueLoc = gl.getUniformLocation(shaderProgram, "random");
+  s_randomValueLoc = gl.getUniformLocation(shaderPrograms['f1v1'], "random");
+  s_mouse = gl.getUniformLocation(shaderPrograms['f1v1'], "mouse");
+  s_resolution = gl.getUniformLocation(shaderPrograms['f1v1'], "resolution");
 
   drawScene();
 }
@@ -58,14 +69,16 @@ function drawScene() {
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   gl.clearColor(0, 0, 0, 0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  gl.useProgram(shaderProgram);
+  gl.useProgram(shaderPrograms['f1v1']);
 
-  // send random values to the fragment shader
-  gl.uniform3f(randomValueLoc, Math.random(), Math.random(), Math.random());
+  // send to the fragment shader
+  gl.uniform3f(s_randomValueLoc, Math.random(), Math.random(), Math.random());
+  gl.uniform2f(s_mouse, 0.35, 0.25);
+  gl.uniform2f(s_resolution, resolution.x, resolution.y);
 
   drawSquare();
 
-  requestAnimationFrame(drawScene);
+  //requestAnimationFrame(drawScene);
 }
 
 function drawSquare(){
