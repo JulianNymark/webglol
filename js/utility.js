@@ -74,3 +74,16 @@ function shaderProgram(vertShaderName, fragShaderName) {
 
   return createProgram(gl, vertexShader, fragmentShader);
 }
+
+function glError(){
+  var glErrorEnum = [
+    'NO_ERROR',
+    'INVALID_ENUM',
+    'INVALID_VALUE',
+    'INVALID_OPERATION',
+    'INVALID_FRAMEBUFFER_OPERATION',
+    'OUT_OF_MEMORY',
+    'CONTEXT_LOST_WEBGL'
+  ];
+  console.log('gl.getError:', glErrorEnum[gl.getError()]);
+}

@@ -23,8 +23,8 @@ function main() {
   document.body.appendChild(canvas);
 
   // webglmagic
-  gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl = canvas.getContext('webgl2');
+  gl.clearColor(1.0, 1.0, 1.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
   gl.depthFunc(gl.LEQUAL);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -39,6 +39,7 @@ function main() {
 
 function afterLoadingShaders() {
   shaderPrograms['1_brush'] = shaderProgram('1.vert', 'brush.frag');
+  shaderPrograms['1_mandelbrot'] = shaderProgram('1.vert', 'mandelbrot.frag');
 
   squareVerticesBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesBuffer);
@@ -59,6 +60,8 @@ function afterLoadingShaders() {
   s_mouse = gl.getUniformLocation(shaderPrograms['1_brush'], "mouse");
   s_resolution = gl.getUniformLocation(shaderPrograms['1_brush'], "resolution");
 
+  s_resolution = gl.getUniformLocation(shaderPrograms['1_mandelbrot'], "resolution");
+
   drawScene();
 }
 
@@ -66,14 +69,18 @@ function drawScene() {
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   gl.clearColor(0, 0, 0, 0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  gl.useProgram(shaderPrograms['1_brush']);
 
-  // send to the fragment shader
-  gl.uniform3f(s_randomValueLoc, Math.random(), Math.random(), Math.random());
-  gl.uniform2f(s_mouse, 0.35, 0.25);
+  /* gl.useProgram(shaderPrograms['1_brush']);
+   * // interact with the program
+   * gl.uniform3f(s_randomValueLoc, Math.random(), Math.random(), Math.random());
+   * gl.uniform2f(s_mouse, 0.35, 0.25);
+   * gl.uniform2f(s_resolution, resolution.x, resolution.y);*/
+
+  gl.useProgram(shaderPrograms['1_mandelbrot']);
   gl.uniform2f(s_resolution, resolution.x, resolution.y);
 
   drawSquare();
+  glError();
 
   //requestAnimationFrame(drawScene);
 }

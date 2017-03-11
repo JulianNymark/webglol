@@ -1,22 +1,30 @@
-#define NUM_STEPS   50
-#define ZOOM_FACTOR 2.0
-#define X_OFFSET    0.5
-
 precision highp float;
 precision mediump int;
 
+uniform vec2 resolution;
+
+#ifndef NUM_STEPS
+const int num_steps = 31;
+#else
+const int num_steps = NUM_STEPS;
+#endif
+
 void main() {
-    vec2 z;
-    float x,y;
+
+    float normalizedX;
+    float normalizedY;
+    float x;
+    float y;
     int steps;
-    float normalizedX = (gl_FragCoord.x - 500.0) / 1000.0 * ZOOM_FACTOR *
-        (1000.0 / 1000.0) - X_OFFSET;
-    float normalizedY = (gl_FragCoord.y - 500.0) / 1000.0 * ZOOM_FACTOR;
 
-    z.x = normalizedX;
-    z.y = normalizedY;
+    normalizedX = (gl_FragCoord.x - resolution.x/2.0) / resolution.x *
+        2.0 *
+        (resolution.x / resolution.y) - 0.5;
+    normalizedY = (gl_FragCoord.y - resolution.y/2.0) / resolution.y * 2.0;
 
-    for (int i=0;i<NUM_STEPS;i++) {
+    vec2 z = vec2(normalizedX, normalizedY);
+
+    for (int i=0; i<num_steps; i++) {
         steps = i;
 
         x = (z.x * z.x - z.y * z.y) + normalizedX;
@@ -28,9 +36,10 @@ void main() {
 
         z.x = x;
         z.y = y;
+
     }
 
-    if (steps == NUM_STEPS-1) {
+    if (steps == num_steps-1) {
         gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
     } else {
         gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
