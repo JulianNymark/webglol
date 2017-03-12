@@ -38,7 +38,7 @@ function main() {
       shaderSource = resolved;
       processShaders();
       postShaders();
-      drawScene(); // only call this once! (it's never ending)
+      mainLoop(); // only call this once! (it's never ending)
     });
 
   thecanvas_container.addEventListener('mousewheel', function(event){
@@ -85,6 +85,24 @@ function postShaders() {
   s_resolution = gl.getUniformLocation(shaderPrograms['1_mandelbrot'], "resolution");
 }
 
+var lastTime = Date.now() / 1000;
+var dt = 0;
+
+function mainLoop() {
+  var now = Date.now() / 1000;
+  dt = now - lastTime;
+  lastTime = now;
+
+  update(dt);
+  drawScene();
+
+  requestAnimationFrame(mainLoop);
+};
+
+function update(dt) {
+  fpsCounter(dt);
+}
+
 function drawScene() {
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   gl.clearColor(0, 0, 0, 0);
@@ -94,8 +112,6 @@ function drawScene() {
   gl.uniform2f(s_resolution, resolution.x, resolution.y);
 
   drawSquare();
-
-  requestAnimationFrame(drawScene);
 }
 
 function drawSquare(){
