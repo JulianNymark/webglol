@@ -2,6 +2,17 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    color: #ffffff;
+}
+
+html, body {
+    display: flex;
+    flex-flow: column nowrap;
+    height: 100%;
+}
+
+body {
+    background-color: #3e3e3e;
 }
 
 ol, li {
