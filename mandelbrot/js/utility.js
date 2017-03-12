@@ -96,7 +96,6 @@ var fpsElement = document.getElementById("fps");
 function fpsCounter(dt){
   totalTimeForFrames += dt;
   totalTimeForFrames -= (frameTimeHistory[frameTimeIndex] || 0);
-  console.log(totalTimeForFrames);
   frameTimeHistory[frameTimeIndex] = dt;
   frameTimeIndex = (frameTimeIndex + 1) % numFramesToAverage;
 
@@ -104,13 +103,3 @@ function fpsCounter(dt){
   var fps = 1 / averageElapsedTime;
   fpsElement.innerText = fps.toFixed(0);
 }
-
-/////////
-
-/* totalTimeForFrames += elapsedTime - (frameTimeHistory[frameTimeIndex] || 0);
- * frameTimeHistory[frameTimeIndex] = elapsedTime;
- * frameTimeIndex = (frameTimeIndex + 1) % numFramesToAverage;
- *
- * var averageElapsedTime = totalTimeForFrames / numFramesToAverage;
- * var fps = 1 / averageElapsedTime;
- * fpsElement.innerText = fps.toFixed(0);*/

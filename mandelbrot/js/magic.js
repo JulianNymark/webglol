@@ -99,8 +99,10 @@ function mainLoop() {
   requestAnimationFrame(mainLoop);
 };
 
+var numStepElement = document.getElementById("num-steps");
 function update(dt) {
   fpsCounter(dt);
+  numStepElement.innerText = num_steps;
 }
 
 function drawScene() {
