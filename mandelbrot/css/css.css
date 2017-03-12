@@ -1,0 +1,12 @@
+#thecanvas {
+  border: 1px solid black;
+}
+
+ul {
+    list-style: none;
+}
+
+ul li:before {
+    content: '💩';
+    font-size: 1.2em;
+}
