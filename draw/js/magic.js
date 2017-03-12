@@ -20,7 +20,8 @@ function main() {
   canvas.id = 'thecanvas';
   canvas.width  = resolution.x;
   canvas.height = resolution.y;
-  document.body.appendChild(canvas);
+  var thecanvas_container = document.getElementById('thecanvas_container');
+  thecanvas_container.appendChild(canvas);
 
   // webglmagic
   gl = canvas.getContext('webgl2');
