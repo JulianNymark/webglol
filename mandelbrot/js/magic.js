@@ -9,6 +9,8 @@ var vertexShaderSource;
 var shaderSource;
 var shaderPrograms = {};
 
+var num_steps = 10;
+
 const resolution = {
   x:1000,
   y:1000
@@ -36,10 +38,27 @@ function main() {
       shaderSource = resolved;
       afterLoadingShaders();
     });
+
+  thecanvas_container.addEventListener('mousewheel', function(event){
+    if (event.wheelDelta > 0) {
+      num_steps++;
+    } else {
+      num_steps--;
+    }
+    getShaders(['1.frag', '1.vert', 'mandelbrot.frag', 'brush.frag'])
+      .then(function(resolved, rejected) {
+        shaderSource = resolved;
+        afterLoadingShaders();
+      });
+
+  });
 }
 
 function afterLoadingShaders() {
-  shaderPrograms['1_brush'] = shaderProgram('1.vert', 'brush.frag');
+  // prepend NUM_STEPS to mandelbrot shader before compile / recompile
+  var define_num_steps = "#define NUM_STEPS " + num_steps + "\n";
+  shaderSource['mandelbrot.frag'] = define_num_steps + shaderSource['mandelbrot.frag'];
+
   shaderPrograms['1_mandelbrot'] = shaderProgram('1.vert', 'mandelbrot.frag');
 
   squareVerticesBuffer = gl.createBuffer();
@@ -56,11 +75,7 @@ function afterLoadingShaders() {
   ];
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-  positionAttributeLocation = gl.getAttribLocation(shaderPrograms['1_brush'], "a_position");
-  s_randomValueLoc = gl.getUniformLocation(shaderPrograms['1_brush'], "random");
-  s_mouse = gl.getUniformLocation(shaderPrograms['1_brush'], "mouse");
-  s_resolution = gl.getUniformLocation(shaderPrograms['1_brush'], "resolution");
-
+  positionAttributeLocation = gl.getAttribLocation(shaderPrograms['1_mandelbrot'], "a_position");
   s_resolution = gl.getUniformLocation(shaderPrograms['1_mandelbrot'], "resolution");
 
   drawScene();
@@ -71,17 +86,10 @@ function drawScene() {
   gl.clearColor(0, 0, 0, 0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  /* gl.useProgram(shaderPrograms['1_brush']);
-   * // interact with the program
-   * gl.uniform3f(s_randomValueLoc, Math.random(), Math.random(), Math.random());
-   * gl.uniform2f(s_mouse, 0.35, 0.25);
-   * gl.uniform2f(s_resolution, resolution.x, resolution.y);*/
-
   gl.useProgram(shaderPrograms['1_mandelbrot']);
   gl.uniform2f(s_resolution, resolution.x, resolution.y);
 
   drawSquare();
-  glError();
 
   //requestAnimationFrame(drawScene);
 }

@@ -15,8 +15,12 @@ body {
     background-color: #3e3e3e;
 }
 
-ol, li {
+ol {
     margin: 10px 20px;
+}
+
+li {
+    margin: 5px 20px;
 }
 
 #top_level_container {
