@@ -6,7 +6,8 @@ var gl;
 var fragmentShaderSource;
 var vertexShaderSource;
 
-var shaderSource;
+var shaderSourceOriginal;
+var shaderSource = {};
 var shaderPrograms = {};
 
 var num_steps = 10;
@@ -32,12 +33,12 @@ function main() {
   gl.depthFunc(gl.LEQUAL);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  // shaderSource fetching (ideally JS should find filenames itself?)
+  // shaderSourceOriginal fetching (ideally JS should find filenames itself?)
   getShaders(['1.vert', 'mandelbrot.frag'])
     .then(function(resolved, rejected) {
-      shaderSource = resolved;
+      shaderSourceOriginal = resolved;
       processShaders();
-      postShaders();
+      afterShaderProcessing();
       mainLoop(); // only call this once! (it's never ending)
     });
 
@@ -47,26 +48,22 @@ function main() {
     } else {
       num_steps--;
     }
-    // new shader & program
-    getShaders(['1.vert', 'mandelbrot.frag'])
-      .then(function(resolved, rejected) {
-        shaderSource = resolved;
-        processShaders();
-        postShaders();
-      });
-
+    processShaders();
+    afterShaderProcessing();
   });
 }
 
 function processShaders() {
   // prepend NUM_STEPS to mandelbrot shader before compile / recompile
   var define_num_steps = "#define NUM_STEPS " + num_steps + "\n";
-  shaderSource['mandelbrot.frag'] = define_num_steps + shaderSource['mandelbrot.frag'];
+  shaderSource['mandelbrot.frag'] = define_num_steps + shaderSourceOriginal['mandelbrot.frag'];
+  // no processing needed for the simple vertex shader
+  shaderSource['1.vert'] = shaderSourceOriginal['1.vert'];
 
   shaderPrograms['1_mandelbrot'] = shaderProgram('1.vert', 'mandelbrot.frag');
 }
 
-function postShaders() {
+function afterShaderProcessing() {
   squareVerticesBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesBuffer);
 
