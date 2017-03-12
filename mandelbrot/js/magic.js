@@ -33,10 +33,12 @@ function main() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   // shaderSource fetching (ideally JS should find filenames itself?)
-  getShaders(['1.frag', '1.vert', 'mandelbrot.frag', 'brush.frag'])
+  getShaders(['1.vert', 'mandelbrot.frag'])
     .then(function(resolved, rejected) {
       shaderSource = resolved;
-      afterLoadingShaders();
+      processShaders();
+      postShaders();
+      drawScene(); // only call this once! (it's never ending)
     });
 
   thecanvas_container.addEventListener('mousewheel', function(event){
@@ -45,22 +47,26 @@ function main() {
     } else {
       num_steps--;
     }
-    getShaders(['1.frag', '1.vert', 'mandelbrot.frag', 'brush.frag'])
+    // new shader & program
+    getShaders(['1.vert', 'mandelbrot.frag'])
       .then(function(resolved, rejected) {
         shaderSource = resolved;
-        afterLoadingShaders();
+        processShaders();
+        postShaders();
       });
 
   });
 }
 
-function afterLoadingShaders() {
+function processShaders() {
   // prepend NUM_STEPS to mandelbrot shader before compile / recompile
   var define_num_steps = "#define NUM_STEPS " + num_steps + "\n";
   shaderSource['mandelbrot.frag'] = define_num_steps + shaderSource['mandelbrot.frag'];
 
   shaderPrograms['1_mandelbrot'] = shaderProgram('1.vert', 'mandelbrot.frag');
+}
 
+function postShaders() {
   squareVerticesBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesBuffer);
 
@@ -77,8 +83,6 @@ function afterLoadingShaders() {
 
   positionAttributeLocation = gl.getAttribLocation(shaderPrograms['1_mandelbrot'], "a_position");
   s_resolution = gl.getUniformLocation(shaderPrograms['1_mandelbrot'], "resolution");
-
-  drawScene();
 }
 
 function drawScene() {
@@ -91,7 +95,7 @@ function drawScene() {
 
   drawSquare();
 
-  //requestAnimationFrame(drawScene);
+  requestAnimationFrame(drawScene);
 }
 
 function drawSquare(){
