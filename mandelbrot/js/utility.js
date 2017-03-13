@@ -69,10 +69,22 @@ function createProgram(gl, vertexShader, fragmentShader) {
 }
 
 function shaderProgram(vertShaderName, fragShaderName) {
-  var vertexShader = createShader(gl, gl.VERTEX_SHADER, shaderSource[vertShaderName]);
-  var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, shaderSource[fragShaderName]);
+  shaders[vertShaderName] = createShader(gl, gl.VERTEX_SHADER, shaderSource[vertShaderName]);
+  shaders[fragShaderName] = createShader(gl, gl.FRAGMENT_SHADER, shaderSource[fragShaderName]);
 
-  return createProgram(gl, vertexShader, fragmentShader);
+  return createProgram(gl, shaders[vertShaderName], shaders[fragShaderName]);
+}
+
+function shaderCleanup(programName, vertShaderName, fragShaderName){
+  if (typeof shaderPrograms[programName] !== 'undefined') {
+    gl.deleteProgram(shaderPrograms[programName]);
+  }
+  if (typeof shaders[vertShaderName] !== 'undefined') {
+    gl.deleteShader(shaders[vertShaderName]);
+  }
+  if (typeof shaders[fragShaderName] !== 'undefined') {
+    gl.deleteShader(shaders[fragShaderName]);
+  }
 }
 
 function glError(){

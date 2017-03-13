@@ -8,6 +8,7 @@ var vertexShaderSource;
 
 var shaderSourceOriginal;
 var shaderSource = {};
+var shaders = {};
 var shaderPrograms = {};
 
 var num_steps = 10;
@@ -42,15 +43,26 @@ function main() {
       mainLoop(); // only call this once! (it's never ending)
     });
 
+  //XB_scrollEventListener(function(event){});
+
   thecanvas_container.addEventListener('mousewheel', function(event){
-    if (event.wheelDelta > 0) {
-      num_steps++;
-    } else {
-      num_steps--;
-    }
+    (event.wheelDelta > 0) ? onScrollUp() : onScrollDown();
+  });
+
+  thecanvas_container.addEventListener('DOMMouseScroll', function(event){
+    (event.detail > 0) ? onScrollUp() : onScrollDown();
+  });
+
+  function onScrollUp() {
+    num_steps++;
     processShaders();
     afterShaderProcessing();
-  });
+  }
+  function onScrollDown() {
+    num_steps--;
+    processShaders();
+    afterShaderProcessing();
+  }
 }
 
 function processShaders() {
@@ -60,6 +72,10 @@ function processShaders() {
   // no processing needed for the simple vertex shader
   shaderSource['1.vert'] = shaderSourceOriginal['1.vert'];
 
+  // delete old shaders & programs
+  shaderCleanup('1_mandelbrot', '1.vert', 'mandelbrot.frag');
+
+  // create new shaders + programs
   shaderPrograms['1_mandelbrot'] = shaderProgram('1.vert', 'mandelbrot.frag');
 }
 
