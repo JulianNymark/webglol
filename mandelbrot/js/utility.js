@@ -115,3 +115,13 @@ function fpsCounter(dt){
   var fps = 1 / averageElapsedTime;
   fpsElement.innerText = fps.toFixed(0);
 }
+
+function addEventListeners(theElement) {
+  theElement.addEventListener('mousewheel', function(event){
+    (event.wheelDelta > 0) ? onScrollUp() : onScrollDown();
+  });
+
+  theElement.addEventListener('DOMMouseScroll', function(event){
+    (event.detail > 0) ? onScrollUp() : onScrollDown();
+  });
+}

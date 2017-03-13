@@ -43,26 +43,18 @@ function main() {
       mainLoop(); // only call this once! (it's never ending)
     });
 
-  //XB_scrollEventListener(function(event){});
+  addEventListeners(thecanvas_container);
+}
 
-  thecanvas_container.addEventListener('mousewheel', function(event){
-    (event.wheelDelta > 0) ? onScrollUp() : onScrollDown();
-  });
-
-  thecanvas_container.addEventListener('DOMMouseScroll', function(event){
-    (event.detail > 0) ? onScrollUp() : onScrollDown();
-  });
-
-  function onScrollUp() {
-    num_steps++;
-    processShaders();
-    afterShaderProcessing();
-  }
-  function onScrollDown() {
-    num_steps--;
-    processShaders();
-    afterShaderProcessing();
-  }
+function onScrollUp() {
+  num_steps++;
+  processShaders();
+  afterShaderProcessing();
+}
+function onScrollDown() {
+  num_steps--;
+  processShaders();
+  afterShaderProcessing();
 }
 
 function processShaders() {
