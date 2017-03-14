@@ -43,7 +43,6 @@ void main() {
 
         z.x = x;
         z.y = y;
-
     }
 
     if (steps >= num_steps-1) {

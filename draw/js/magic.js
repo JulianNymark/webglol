@@ -6,7 +6,9 @@ var gl;
 var fragmentShaderSource;
 var vertexShaderSource;
 
-var shaderSource;
+var shaderSourceOriginal;
+var shaderSource = {};
+var shaders = {};
 var shaderPrograms = {};
 
 const resolution = {
@@ -31,16 +33,27 @@ function main() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   // shaderSource fetching (ideally JS should find filenames itself?)
-  getShaders(['1.frag', '1.vert', 'brush.frag'])
+  getShaders(['1.vert', 'brush.frag'])
     .then(function(resolved, rejected) {
-      shaderSource = resolved;
-      afterLoadingShaders();
+      shaderSourceOriginal = resolved;
+      processShaders();
+      afterShaderProcessing();
+      mainLoop(); // only call this once! (it's never ending)
     });
 }
 
-function afterLoadingShaders() {
-  shaderPrograms['1_brush'] = shaderProgram('1.vert', 'brush.frag');
+function processShaders() {
+  shaderSource['1.vert'] = shaderSourceOriginal['1.vert'];
+  shaderSource['brush.frag'] = shaderSourceOriginal['brush.frag'];
 
+  // delete old shaders & programs
+  shaderCleanup('1_brush', '1.vert', 'brush.frag');
+
+  // create new shaders + programs
+  shaderPrograms['1_brush'] = shaderProgram('1.vert', 'brush.frag');
+}
+
+function afterShaderProcessing() {
   squareVerticesBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesBuffer);
 
@@ -59,8 +72,23 @@ function afterLoadingShaders() {
   s_randomValueLoc = gl.getUniformLocation(shaderPrograms['1_brush'], "random");
   s_mouse = gl.getUniformLocation(shaderPrograms['1_brush'], "mouse");
   s_resolution = gl.getUniformLocation(shaderPrograms['1_brush'], "resolution");
+}
 
+var lastTime = Date.now() / 1000;
+var dt = 0;
+function mainLoop() {
+  var now = Date.now() / 1000;
+  dt = now - lastTime;
+  lastTime = now;
+
+  update(dt);
   drawScene();
+
+  requestAnimationFrame(mainLoop);
+};
+
+function update(dt) {
+  fpsCounter(dt);
 }
 
 function drawScene() {
@@ -75,9 +103,6 @@ function drawScene() {
   gl.uniform2f(s_resolution, resolution.x, resolution.y);
 
   drawSquare();
-  glError();
-
-  //requestAnimationFrame(drawScene);
 }
 
 function drawSquare(){

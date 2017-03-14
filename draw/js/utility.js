@@ -87,3 +87,31 @@ function glError(){
   ];
   console.log('gl.getError:', glErrorEnum[gl.getError()]);
 }
+
+function shaderCleanup(programName, vertShaderName, fragShaderName){
+  if (typeof shaderPrograms[programName] !== 'undefined') {
+    gl.deleteProgram(shaderPrograms[programName]);
+  }
+  if (typeof shaders[vertShaderName] !== 'undefined') {
+    gl.deleteShader(shaders[vertShaderName]);
+  }
+  if (typeof shaders[fragShaderName] !== 'undefined') {
+    gl.deleteShader(shaders[fragShaderName]);
+  }
+}
+
+const numFramesToAverage = 16;
+var frameTimeHistory = [];
+var frameTimeIndex = 0;
+var totalTimeForFrames = 0.0;
+var fpsElement = document.getElementById("fps");
+function fpsCounter(dt){
+  totalTimeForFrames += dt;
+  totalTimeForFrames -= (frameTimeHistory[frameTimeIndex] || 0);
+  frameTimeHistory[frameTimeIndex] = dt;
+  frameTimeIndex = (frameTimeIndex + 1) % numFramesToAverage;
+
+  var averageElapsedTime = totalTimeForFrames / numFramesToAverage;
+  var fps = 1 / averageElapsedTime;
+  fpsElement.innerText = fps.toFixed(0);
+}
