@@ -88,15 +88,16 @@ function glError(){
   console.log('gl.getError:', glErrorEnum[gl.getError()]);
 }
 
-function shaderCleanup(programName, vertShaderName, fragShaderName){
-  if (typeof shaderPrograms[programName] !== 'undefined') {
-    gl.deleteProgram(shaderPrograms[programName]);
+function shaderCleanup(programNames, shaderNames){
+  for (i=0; i<programNames.length; i++) {
+    if (typeof shaderPrograms[programNames[i]] !== 'undefined') {
+      gl.deleteProgram(shaderPrograms[programNames[i]]);
+    }
   }
-  if (typeof shaders[vertShaderName] !== 'undefined') {
-    gl.deleteShader(shaders[vertShaderName]);
-  }
-  if (typeof shaders[fragShaderName] !== 'undefined') {
-    gl.deleteShader(shaders[fragShaderName]);
+  for (i=0; i<shaderNames.length; i++) {
+    if (typeof shaders[shaderNames[i]] !== 'undefined') {
+      gl.deleteShader(shaders[shaderNames[i]]);
+    }
   }
 }
 
@@ -114,4 +115,13 @@ function fpsCounter(dt){
   var averageElapsedTime = totalTimeForFrames / numFramesToAverage;
   var fps = 1 / averageElapsedTime;
   fpsElement.innerText = fps.toFixed(0);
+}
+
+function mouseInputListeners(theElement) {
+  theElement.addEventListener('mousemove', function(event){
+    mouse.pixel_x = event.layerX;
+    mouse.pixel_y = event.layerY;
+    mouse.x = mouse.pixel_x / resolution.x;
+    mouse.y = ((mouse.pixel_y / resolution.y) * -1) + 1.0; //flipperino
+  });
 }
