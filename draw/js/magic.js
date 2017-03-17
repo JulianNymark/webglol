@@ -44,6 +44,7 @@ function main() {
 
   // Create a texture.
   sometexture = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, sometexture);
 
   // Set the parameters so we can render any size image.
@@ -52,8 +53,6 @@ function main() {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
-  // Upload the image into the texture.
-  //gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, null);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, resolution.x, resolution.y, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
   gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, sometexture, 0);
   //////
@@ -137,7 +136,7 @@ function update(dt) {
   fpsCounter(dt);
 }
 
-function drawScene() {
+function drawSceneOld() {
   // draw brush -> canvas
   gl.bindFramebuffer(gl.FRAMEBUFFER, someFramebuffer);
   gl.useProgram(shaderPrograms['one_brush']);
@@ -155,16 +154,33 @@ function drawScene() {
   // draw canvas -> GPU framebuffer? (null?)
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   gl.useProgram(shaderPrograms['one_canvas']);
+
+  gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, sometexture);
+  gl.uniform1i(one_canvas_canvastex, 0);
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   gl.clearColor(1.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  //gl.activeTexture(gl.TEXTURE0);
-  gl.uniform1i(one_canvas_canvastex, sometexture);
 
   drawSquare(one_canvas_positionLocation);
+
+  gl.bindTexture(gl.TEXTURE_2D, null);
+}
+
+function drawScene() {
+  // draw brush -> canvas
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.useProgram(shaderPrograms['one_brush']);
+
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+  gl.uniform3f(one_brush_randomValueLoc, Math.random(), Math.random(), Math.random());
+  gl.uniform2f(one_brush_mouse, mouse.x, mouse.y);
+  gl.uniform2f(one_brush_resolution, resolution.x, resolution.y);
+
+  drawSquare(one_brush_positionLocation);
 }
 
 function drawSquare(positionLocation){
